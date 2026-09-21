@@ -1,0 +1,217 @@
+/* ============================================================
+   ELEVATE REALTY GROUP — Core Design Tokens
+   Colors + Typography (base + semantic)
+   ------------------------------------------------------------
+   Brand: Elevate Realty Group (Edmonton & Calgary, AB)
+   Operating under Real Broker.
+   Palette + type per official brand guidelines.
+   Tagline: "Modern Moves. Real Results"
+   ============================================================ */
+
+/* ---- Webfonts -----------------------------------------------------------
+   Headers: Montserrat (Bold / UPPERCASE). Impact display option: Anton /
+   League Spartan. Body: Poppins (with Montserrat Regular as companion).
+   Clean, modern, minimal — no script or decorative faces.
+   Loaded from Google Fonts CDN; swap for local files if licensing requires.
+-------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Anton&family=League+Spartan:wght@600;700;800&display=swap');
+
+:root {
+  /* ---------- BRAND PALETTE (official) ---------- */
+  --erg-blue:     #030328;  /* PRIMARY — "Elevate Blue" */
+  --erg-charcoal: #1D1D1D;  /* Charcoal */
+  --erg-white:    #FFFFFF;  /* White */
+  --erg-aqua:     #00FBF0;  /* ACCENT — "Accent Aqua" */
+
+  /* ---------- BLUE FAMILY (derived support shades) ---------- */
+  --erg-blue-ink:  #010110;  /* deepest — scrims / overlays */
+  --erg-blue-900:  #030328;  /* = primary */
+  --erg-blue-800:  #0A0A3A;  /* raised surface on dark */
+  --erg-blue-700:  #15154E;  /* hover on dark */
+  --erg-blue-600:  #232366;  /* borders on dark */
+
+  /* ---------- AQUA SUPPORT (derived) ---------- */
+  --erg-aqua-soft: #6BFCF5;  /* lighter aqua */
+  --erg-aqua-deep: #048A84;  /* accessible aqua for text/icons on white */
+  --erg-aqua-tint: #DEFEFC;  /* pale aqua wash (badges/fills on light) */
+
+  /* ---------- NEUTRALS (cool / clean) ---------- */
+  --erg-paper:       #F5F6F8;  /* light page background */
+  --erg-mist:        #ECEEF2;  /* alt section background */
+  --erg-line:        #E4E6EC;  /* hairline borders */
+  --erg-line-strong: #D0D3DC;  /* stronger dividers */
+  --erg-ink:         #1D1D1D;  /* primary text on light (Charcoal) */
+  --erg-slate:       #565A66;  /* secondary text */
+  --erg-muted:       #8C909C;  /* tertiary / captions */
+
+  /* ---------- SEMANTIC ---------- */
+  --erg-success:     #1FA37A;
+  --erg-warning:     #C28A1E;
+  --erg-danger:      #D5462E;
+  --erg-info:        #2E5AAC;
+
+  /* ---------- SEMANTIC ROLES ---------- */
+  --bg:              var(--erg-paper);
+  --surface:         var(--erg-white);
+  --surface-alt:     var(--erg-mist);
+  --border:          var(--erg-line);
+  --text:            var(--erg-ink);
+  --text-secondary:  var(--erg-slate);
+  --text-muted:      var(--erg-muted);
+  --accent:          var(--erg-aqua);
+  --primary:         var(--erg-blue);
+  --on-primary:      #FFFFFF;
+  --link:            var(--erg-blue);
+
+  /* ---------- LEGACY ALIASES ----------
+     Older component CSS/JSX references --erg-navy* and --erg-gold*; these
+     remap them onto the official palette so the whole kit retunes at once.
+     --erg-gold* now resolve to the Accent Aqua family. */
+  --erg-navy:        var(--erg-blue);
+  --erg-navy-ink:    var(--erg-blue-ink);
+  --erg-navy-700:    var(--erg-blue-800);
+  --erg-navy-600:    var(--erg-blue-700);
+  --erg-slate-blue:  var(--erg-blue);
+  --erg-gold:        var(--erg-aqua);
+  --erg-gold-soft:   var(--erg-aqua-soft);
+  --erg-gold-tint:   var(--erg-aqua-tint);
+
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-display: 'Montserrat', 'Helvetica Neue', Arial, sans-serif; /* headers — bold/uppercase */
+  --font-body:    'Poppins', 'Helvetica Neue', Arial, sans-serif;    /* body + UI */
+  --font-impact:  'Anton', 'League Spartan', 'Montserrat', sans-serif;/* oversized display option */
+
+  /* ---------- TYPE SCALE (1.250 major-third on a 16px base) ---------- */
+  --fs-display: 4.209rem;  /* 67px — hero */
+  --fs-h1:      3.157rem;  /* 51px */
+  --fs-h2:      2.369rem;  /* 38px */
+  --fs-h3:      1.777rem;  /* 28px */
+  --fs-h4:      1.333rem;  /* 21px */
+  --fs-lead:    1.25rem;   /* 20px intro paragraphs */
+  --fs-body:    1rem;      /* 16px */
+  --fs-sm:      0.875rem;  /* 14px */
+  --fs-xs:      0.75rem;   /* 12px labels */
+
+  /* ---------- WEIGHTS ---------- */
+  --fw-light:   300;
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
+  --fw-black:   800;
+
+  /* ---------- TRACKING ---------- */
+  --tracking-brand: 0.28em;   /* ELEVATE-style lockups, eyebrows */
+  --tracking-wide:  0.08em;
+  --tracking-tight: -0.01em;
+
+  /* ---------- RADII ---------- */
+  --r-xs: 2px;  --r-sm: 4px;  --r-md: 8px;
+  --r-lg: 14px; --r-xl: 22px; --r-pill: 999px;
+
+  /* ---------- SPACING (4px base) ---------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+  --sp-9: 96px; --sp-10: 128px;
+
+  /* ---------- ELEVATION ---------- */
+  --shadow-xs: 0 1px 2px rgba(3,3,40,.06);
+  --shadow-sm: 0 2px 8px rgba(3,3,40,.07);
+  --shadow-md: 0 8px 24px rgba(3,3,40,.10);
+  --shadow-lg: 0 20px 48px rgba(3,3,40,.18);
+  --shadow-blue: 0 18px 40px rgba(3,3,40,.34);
+  --shadow-navy: 0 18px 40px rgba(3,3,40,.34); /* legacy alias */
+  --glow-aqua: 0 0 0 3px rgba(0,251,240,.28);
+
+  /* ---------- MOTION ---------- */
+  --ease: cubic-bezier(.4, 0, .2, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+  --dur-slow: 420ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPOGRAPHY
+   ============================================================ */
+.erg-eyebrow {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semi);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-brand);
+  text-transform: uppercase;
+  color: var(--erg-blue);
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+  font-family: var(--font-display);
+  color: var(--text);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-display);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+.impact {
+  font-family: var(--font-impact);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 0.95;
+}
+h1, .h1 { font-size: var(--fs-h1); font-weight: var(--fw-bold); }
+h2, .h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
+h3, .h3 { font-size: var(--fs-h3); font-weight: var(--fw-semi); line-height: 1.18; }
+h4, .h4 { font-size: var(--fs-h4); font-weight: var(--fw-semi); line-height: 1.25; }
+
+.lead {
+  font-family: var(--font-body);
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-weight: var(--fw-regular);
+}
+
+body, p, .body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--text);
+  font-weight: var(--fw-regular);
+}
+p { margin: 0 0 1em; text-wrap: pretty; }
+
+small, .small { font-size: var(--fs-sm); line-height: 1.5; }
+.caption {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  letter-spacing: var(--tracking-wide);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semi);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--erg-aqua-deep); }
+
+/* Price / numeral treatment used across listings */
+.numeral {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+}
