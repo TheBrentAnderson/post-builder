@@ -203,7 +203,7 @@ window.TEMPLATES.push(
     ],
   },
   {
-    thumb: "assets/thumbs/team-bw.jpg", id: "proof-client-story", cat: "proof", name: "The Client Story",
+    thumb: "assets/thumbs/unpacking-kitchen.jpg", id: "proof-client-story", cat: "proof", name: "The Client Story",
     desc: "A testimonial with the story around it. Person to person, not a quote card.",
     caption: "[Client first name] and [Client first name] closed on their [home type] in [Neighbourhood] last week, and their search was not a straight line.\n\nWhen we started, [the real starting point. They had been outbid twice. They were not sure they could buy at all. They had a house to sell first.]\n\nThe hard part: [the genuine obstacle, for example the budget did not match the neighbourhood they wanted, so we had to find the pocket that did.]\n\nWhat changed it: [the specific move, for example we widened the search by two neighbourhoods and found a home that had been listed wrong.]\n\n[X] months, [X] showings, and one very good Tuesday later, they got the keys.\n\nWhat they said afterwards: \"[the honest quote, in their words.]\"\n\nThis is the part of the job that does not show up in a sold graphic. Most searches have a rough middle. That is normal, and it is the part I am there for.\n\nIf you have been at this a while and it is not going the way you hoped, send me a message. There is usually a move nobody has suggested yet.",
     tags: "#clientlove #[neighbourhood] #edmontonrealestate #yegrealestate #happyclients",
@@ -467,7 +467,7 @@ window.TEMPLATES.push(
     ],
   },
   {
-    thumb: "assets/thumbs/brent-brick.jpg", id: "sold-seller-estate", cat: "sold", name: "Sold: The Family Home",
+    thumb: "assets/thumbs/bungalow-backyard.jpg", id: "sold-seller-estate", cat: "sold", name: "Sold: The Family Home",
     desc: "Estate or long-held home. Sold as is, on the family's timeline.",
     caption: "Just sold in [Neighbourhood]: the family home of [X] years, listed at [$list], firm at [$sold].\n\nThis is a different kind of sale, and it is the one I get asked about most quietly.\n\nThe situation: [the honest starting point. An estate with three siblings. A downsizer who had been in the same house since [year]. Nobody had updated it and nobody wanted to.]\n\nThe hard conversation: what the home was worth in as-is condition, not what it would be worth after [$X] of renovations nobody had the time or the stomach to do.\n\nWhat we did instead of renovating: cleaned it out, priced it honestly for its condition, disclosed everything up front, and found the buyer who wanted a project in that location.\n\nThe result: [X] showings, [X] offers, firm at [$sold] with a possession date that gave the family time to clear the rest.\n\nSelling a home like this is not really a marketing problem. It is a sequencing problem, and most of the work is making sure nobody feels rushed.\n\nIf you are dealing with a family property, an estate, or a parent who is ready to downsize, send me a message. No pressure, and no timeline but yours.",
     tags: "#justsold #[neighbourhood] #edmontonrealestate #estatesale #downsizing",
@@ -549,7 +549,7 @@ window.TEMPLATES.push(
     ],
   },
   {
-    thumb: "assets/thumbs/brent-black-house.jpg", id: "sold-buyer-patient", cat: "sold", name: "Sold: The Patient Buyer",
+    thumb: "assets/thumbs/townhouse-exterior.jpg", id: "sold-buyer-patient", cat: "sold", name: "Sold: The Patient Buyer",
     desc: "Walked away from three, bought the tired listing under asking.",
     caption: "My buyers just closed in [Neighbourhood] at [$X] under list, and they walked away from three homes to get there.\n\nHere is the version nobody posts.\n\nEvery home they loved in the first two months went over asking. [X] times. We were competing against people with more money and fewer conditions, and it was demoralizing.\n\nSo we changed the search entirely. Instead of watching new listings, I started watching old ones. Anything over [X] days on market in the areas they wanted.\n\nThe home they bought had been listed [X] days. Priced wrong from day one, bad photos, and a seller who had stopped expecting the phone to ring.\n\nWhat we did: asked the listing agent directly why it had not sold, offered [$X] under with the comps attached so it did not read as an insult, and gave the sellers a fast, clean close.\n\nThey accepted in [X] hours. No competition, no waived conditions, no panic.\n\nPatience is a strategy. It just does not feel like one in month four, which is why most buyers abandon it right before it works.\n\nLosing every bid in [City]? Send me a message. There is a whole other list nobody is watching.",
     tags: "#justsold #[neighbourhood] #edmontonrealestate #yegbuyers #homebuyertips",
