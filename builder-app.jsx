@@ -1,6 +1,14 @@
 /* global React, ReactDOM */
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 const { Slide, slideToPng, download, copyText, Field, Seg, load, save, DEFAULT_PROFILE, randomSchemes, SCHEMES } = window.ERGB;
+const TEXT_COLOURS = [
+  { v: "", l: "Auto", css: "linear-gradient(135deg,#FFFFFF 0 50%,#030328 50% 100%)" },
+  { v: "#FFFFFF", l: "White", css: "#FFFFFF" },
+  { v: "#030328", l: "Elevate Blue", css: "#030328" },
+  { v: "#1D1D1D", l: "Charcoal", css: "#1D1D1D" },
+  { v: "#00FBF0", l: "Accent Aqua", css: "#00FBF0" },
+  { v: "#048A84", l: "Deep teal", css: "#048A84" },
+];
 
 const FORMATS = {
   "4:5": { label: "Carousel 4:5", ratio: "4 / 5", w: 1080, h: 1350, note: "Feed carousel" },
@@ -12,7 +20,7 @@ function Nav({ view, go, profile }) {
     <header className="nav">
       <button className="nav__brand" onClick={() => go("landing")}>
         <img src="assets/erg-white.png" alt="Elevate Realty Group" />
-        <span className="nav__tool">Post Builder</span>
+        <span className="nav__tool">Studio</span>
       </button>
       <nav className="nav__links">
         <button className={view === "gallery" ? "is-on" : ""} onClick={() => go("gallery")}>Templates</button>
@@ -32,7 +40,7 @@ function Landing({ go }) {
     <main className="landing">
       <section className="hero">
         <span className="eyebrow">Elevate Realty Group · Internal Tool</span>
-        <h1>On-brand posts<br />in five <em>minutes</em>.</h1>
+        <h1><span className="ln">Less time posting.</span><span className="ln">More time <em>Selling</em>.</span></h1>
         <p className="lead">Pick a template, drop in your photos, edit the words. Everything comes out sized and ready for Instagram, with your name, headshot and contact details already on the last slide. Caption and hashtags included.</p>
         <div className="hero__cta">
           <button className="btn btn--aqua" onClick={() => go("gallery")}>Start a post</button>
@@ -58,7 +66,7 @@ function Landing({ go }) {
         <div className="cats__grid">
           {counts.map((c) => (
             <button className="catcard" key={c.id} onClick={() => go("gallery")}>
-              <span className="catcard__n">{c.n} templates</span>
+              <span className="catcard__n">{c.n} {c.n === 1 ? "template" : "templates"}</span>
               <h3>{c.label}</h3>
               <p>{c.blurb}</p>
               <span className="catcard__go">Browse <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg></span>
@@ -79,7 +87,8 @@ function Landing({ go }) {
 function MiniPreview({ tpl }) {
   const s = tpl.slides[0];
   return (
-    <div className="mini">
+    <div className={"mini" + (tpl.thumb ? " mini--photo" : "")}>
+      {tpl.thumb ? <img className="mini__img" src={tpl.thumb} alt="" loading="lazy" /> : null}
       <span className="mini__rule" />
       <span className="mini__head">{(s.head || "").replace(/\*/g, "")}</span>
     </div>
@@ -89,7 +98,8 @@ function Gallery({ go, openTemplate }) {
   const [cat, setCat] = useState("all");
   const list = window.TEMPLATES.filter((t) => cat === "all" || t.cat === cat);
   return (
-    <main className="page">
+    <main className="page page--dark">
+      <div className="page__inner">
       <div className="page__head">
         <div>
           <span className="eyebrow">Shared Library</span>
@@ -119,6 +129,7 @@ function Gallery({ go, openTemplate }) {
           </article>
         ))}
       </div>
+      </div>
     </main>
   );
 }
@@ -128,7 +139,7 @@ function Profile({ profile, setProfile, go }) {
   const fileRef = useRef(null);
   const onFace = (f) => { if (!f) return; const r = new FileReader(); r.onload = () => setProfile({ ...profile, headshot: r.result }); r.readAsDataURL(f); };
   return (
-    <main className="page page--narrow">
+    <main className="page page--narrow page--dark">
       <span className="eyebrow">Your details</span>
       <h1 className="page__title">My Profile</h1>
       <p className="page__sub">This is what gets stamped on the last slide of every post you build. Set it once.</p>
@@ -152,7 +163,7 @@ function Profile({ profile, setProfile, go }) {
           </label>
         </div>
       </div>
-      <button className="btn btn--aqua" onClick={() => go("gallery")}>Save and browse templates</button>
+      <div className="profile__save"><button className="btn btn--aqua btn--sm" onClick={() => go("gallery")}>Save</button></div>
     </main>
   );
 }
@@ -253,69 +264,78 @@ function Builder({ tpl, profile, go }) {
         <span className="eyebrow">{(window.CATEGORIES.find((c) => c.id === tpl.cat) || {}).label}</span>
         <h2 className="editor__title">{tpl.name}</h2>
 
-        <div className="block">
-          <span className="block__label">Format</span>
+        <div className="tools">
           <Seg value={draft.format} onChange={(v) => setDraft({ ...draft, format: v })}
             options={Object.entries(FORMATS).map(([v, f]) => ({ v, l: f.label }))} />
+          <div className="tools__row">
+            <button className="btn btn--ghost btn--sm" title="Pick a different approved Elevate colourway for the whole post"
+              onClick={() => setDraft((d) => ({ ...d, schemes: randomSchemes(tpl.slides, d.schemes) }))}>Shuffle colour</button>
+            <button className="btn btn--ghost btn--sm btn--icon" aria-label="Back to the default colourway" title="Back to the default colourway"
+              onClick={() => setDraft((d) => ({ ...d, schemes: tpl.slides.map((s) => (s.kind === "media" ? { key: "blue", accent: "#00FBF0" } : { key: "blue" })) }))}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8" /></svg>
+            </button>
+          </div>
+          <div className="tools__row">
+            <button className="btn btn--ghost btn--sm" title="Rewrite every slide to the next approved version of this post"
+              onClick={rewordPost}>Reword</button>
+            <button className="btn btn--ghost btn--sm btn--icon" aria-label="Back to the original wording" title="Back to the original wording"
+              onClick={() => setDraft((d) => ({ ...d, version: 0, copy: tpl.slides.map(() => ({})) }))}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8" /></svg>
+            </button>
+          </div>
           <p className="hint">{fmt.note} · exports at {fmt.w} × {fmt.h}</p>
         </div>
 
         <div className="block">
-          <span className="block__label">Colour</span>
-          <p className="hint">Picks one approved Elevate colourway and applies it across every slide. Palette stays locked, only the arrangement changes.</p>
-          <button className="btn btn--ghost btn--sm" onClick={() => setDraft((d) => ({ ...d, schemes: randomSchemes(tpl.slides, d.schemes) }))}>Randomize colours</button>
-          <button className="btn btn--ghost btn--sm" onClick={() => setDraft((d) => ({ ...d, schemes: tpl.slides.map((s) => (s.kind === "media" ? { key: "blue", accent: "#00FBF0" } : { key: "blue" })) }))}>Reset to default</button>
-        </div>
-
-        <div className="block">
-          <span className="block__label">Wording</span>
-          <p className="hint">Each version rewrites the whole post so every slide still reads together. Or swap a single slide below.</p>
-          <button className="btn btn--ghost btn--sm" onClick={rewordPost}>Reword this post</button>
-        </div>
-
-        <div className="block">
-          <span className="block__label">Slides</span>
-          <div className="thumbs">
-            {tpl.slides.map((s, n) => (
-              <button key={n} className={"thumb" + (n === i ? " is-on" : "")} onClick={() => setI(n)}>
-                <span className="thumb__n">{n + 1}</span>
-                <span className="thumb__t">{s.kind === "cta" ? "Closing" : (draft.copy[n]?.head ?? s.head ?? "").replace(/\*/g, "").split("\n")[0]}</span>
-              </button>
-            ))}
+          <span className="block__label">Slide {i + 1} of {total}</span>
+          <Field label="Headline" area rows={3} format value={val("head")} onChange={(v) => patch(i, "head", v)} />
+          {cur.list !== undefined ? <Field label="List, one per line" area rows={4} format value={val("list")} onChange={(v) => patch(i, "list", v)} /> : null}
+          <Field label="Supporting line" area rows={3} format value={val("sub")} onChange={(v) => patch(i, "sub", v)} />
+          <div className="pair">
+            <div className="field">
+              <span className="field__label">Position</span>
+              <Seg value={curCopy.pos || cur.pos || "bottom"} onChange={(v) => patch(i, "pos", v)}
+                options={[{ v: "top", l: "Top" }, { v: "center", l: "Mid" }, { v: "bottom", l: "Btm" }]} />
+            </div>
+            <div className="field">
+              <span className="field__label">Alignment</span>
+              <Seg value={curCopy.align || cur.align || "left"} onChange={(v) => patch(i, "align", v)}
+                options={[{ v: "left", l: "Left" }, { v: "center", l: "Centre" }, { v: "right", l: "Right" }]} />
+            </div>
           </div>
-        </div>
-
-        <div className="block">
-          <span className="block__label">Slide {i + 1} copy</span>
-          <p className="hint">Wrap a word in *asterisks* to highlight it in aqua.</p>
-          <Field label="Headline" area rows={3} value={val("head")} onChange={(v) => patch(i, "head", v)} />
-          {cur.list !== undefined ? <Field label="List, one per line" area rows={4} value={val("list")} onChange={(v) => patch(i, "list", v)} /> : null}
-          <Field label="Supporting line" area rows={3} value={val("sub")} onChange={(v) => patch(i, "sub", v)} />
-          {(cur.alts || []).length ? (
-            <>
-              <span className="field__label">Other wordings for this slide</span>
-              <div className="alts">
-                {[{ head: cur.head, sub: cur.sub, list: cur.list }, ...cur.alts].map((a, n) => (
-                  <button key={n} type="button"
-                    className={"alt" + (val("head") === a.head ? " is-on" : "")}
-                    onClick={() => applyAlt(i, a)}>
-                    {a.head.replace(/\*/g, "").replace(/\n/g, " ")}
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : null}
-          <span className="field__label">Text position</span>
-          <Seg value={curCopy.pos || cur.pos || "bottom"} onChange={(v) => patch(i, "pos", v)}
-            options={[{ v: "top", l: "Top" }, { v: "center", l: "Middle" }, { v: "bottom", l: "Bottom" }]} />
+          <div className="field">
+            <span className="field__label">Accent and text colour</span>
+            <div className="swatches swatches--row">
+              {TEXT_COLOURS.map((c) => (
+                <button key={c.l} type="button" title={c.l}
+                  className={"swatch" + ((curCopy.ink || "") === c.v ? " is-on" : "")}
+                  style={{ background: c.css }} onClick={() => patch(i, "ink", c.v)} />
+              ))}
+            </div>
+          </div>
           {cur.kind === "media" ? <p className="hint">Click the preview to add your photo or video{cur.hint ? `: ${cur.hint.toLowerCase()}` : ""}.</p> : null}
         </div>
 
-        <div className="block">
-          <span className="block__label">Caption</span>
+        {(cur.alts || []).length ? (
+          <details className="drop">
+            <summary>Other wordings for this slide</summary>
+            <div className="alts">
+              {[{ head: cur.head, sub: cur.sub, list: cur.list }, ...cur.alts].map((alt, n) => (
+                <button key={n} type="button"
+                  className={"alt" + (val("head") === alt.head ? " is-on" : "")}
+                  onClick={() => applyAlt(i, alt)}>
+                  {alt.head.replace(/\*/g, "").replace(/\n/g, " ")}
+                </button>
+              ))}
+            </div>
+          </details>
+        ) : null}
+
+        <details className="drop">
+          <summary>Caption and hashtags</summary>
           <p className="caption-box" ref={capRef} onClick={selectCaption}>{tpl.caption}{"\n\n"}{tpl.tags}</p>
           <button className="btn btn--ghost btn--sm" onClick={copyCaption}>{copied || "Copy caption and hashtags"}</button>
-        </div>
+        </details>
 
         <div className="block block--export">
           <button className="btn btn--aqua" onClick={exportAll}>Download all {total} slides</button>
@@ -357,7 +377,7 @@ function Builder({ tpl, profile, go }) {
               <div className="rail" style={{ transform: `translateX(-${i * 100}%)` }}>
                 {tpl.slides.map((s, n) => (
                   <div className="rail__cell" key={n} data-export={n}>
-                    <Slide slide={s} i={n} total={total} profile={profile} draft={draft} editable={n === i} showCounter={false} />
+                    <Slide slide={s} i={n} total={total} profile={profile} draft={draft} editable={n === i} />
                   </div>
                 ))}
               </div>
@@ -397,7 +417,7 @@ function Builder({ tpl, profile, go }) {
             <div className="rail" style={{ transform: `translateX(-${i * 100}%)` }}>
               {tpl.slides.map((s, n) => (
                 <div className="rail__cell" key={n} data-export={n}>
-                  <Slide slide={s} i={n} total={total} profile={profile} draft={draft} editable={n === i} showCounter={draft.format === "4:5"} />
+                  <Slide slide={s} i={n} total={total} profile={profile} draft={draft} editable={n === i} />
                 </div>
               ))}
             </div>

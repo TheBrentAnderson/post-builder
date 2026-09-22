@@ -30,3 +30,7 @@ Open `templates.js`, copy an existing block, change the `id`, `name`, `cat`, and
 - Anyone with the link can open it. There are no accounts.
 
 Fixing those three means adding a backend (accounts, a shared template store, cloud media). The code is already split along those lines.
+
+## Monthly template packs
+
+New templates ship as a dated pack file, e.g. `templates-2026-09.js`. Each pack pushes its own categories and templates onto `window.CATEGORIES` / `window.TEMPLATES`, so the core `templates.js` never has to change. To add a month: copy the newest pack, rewrite its contents, and add one `<script src="templates-YYYY-MM.js"></script>` line in `index.html` after `templates.js`.

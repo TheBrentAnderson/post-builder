@@ -1,5 +1,5 @@
 /* global React, ReactDOM */
-const { useState, useEffect, useRef, useCallback, useMemo } = React;
+const { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } = React;
 
 /* ---------- storage ---------- */
 const DB = "erg_builder", STORE = "media";
@@ -28,15 +28,36 @@ const DEFAULT_PROFILE = {
 };
 
 /* ---------- rich text ---------- */
+const HILITE = [
+  { k: "", label: "Accent", css: "var(--s-accent)" },
+  { k: "1", label: "Aqua", css: "#00FBF0" },
+  { k: "2", label: "Aqua soft", css: "#6BFCF5" },
+  { k: "3", label: "Deep teal", css: "#048A84" },
+  { k: "4", label: "White", css: "#FFFFFF" },
+  { k: "5", label: "Elevate Blue", css: "#030328" },
+];
+const HILITE_BY_KEY = Object.fromEntries(HILITE.map((h) => [h.k, h]));
+
+function markup(text, keyBase) {
+  return String(text).split(/(\*[^*]*\*|_[^_]*_|~[^~]*~)/g).map((p, pi) => {
+    const k = keyBase + "-" + pi;
+    if (p.startsWith("*") && p.endsWith("*") && p.length > 2) {
+      let body = p.slice(1, -1), css = null;
+      const m = body.match(/^([1-5])\|/);
+      if (m) { css = (HILITE_BY_KEY[m[1]] || {}).css; body = body.slice(2); }
+      return <em key={k} style={css ? { color: css } : undefined}>{markup(body, k)}</em>;
+    }
+    if (p.startsWith("_") && p.endsWith("_") && p.length > 2) return <i key={k}>{markup(p.slice(1, -1), k)}</i>;
+    if (p.startsWith("~") && p.endsWith("~") && p.length > 2) return <u key={k}>{markup(p.slice(1, -1), k)}</u>;
+    return <React.Fragment key={k}>{p}</React.Fragment>;
+  });
+}
 function RichText({ text }) {
   if (!text) return null;
   return String(text).split("\n").map((line, li) => (
     <React.Fragment key={li}>
       {li > 0 && <br />}
-      {line.split(/(\*[^*]+\*)/g).map((p, pi) =>
-        p.startsWith("*") && p.endsWith("*") && p.length > 2
-          ? <em key={pi}>{p.slice(1, -1)}</em>
-          : <React.Fragment key={pi}>{p}</React.Fragment>)}
+      {markup(line, String(li))}
     </React.Fragment>
   ));
 }
@@ -111,11 +132,10 @@ function MediaSlot({ slotKey, hint, editable }) {
 }
 
 /* ---------- logo lockup + CTA block ---------- */
-function Lockup({ profile, light }) {
+function Lockup({ light }) {
   return (
     <div className="lockup">
       <img className="lockup__mark" src={light ? "assets/erg-navy.png" : "assets/erg-white.png"} alt="Elevate Realty Group" />
-      {profile.brokerage ? <span className="lockup__broker">Brokered by Real</span> : null}
     </div>
   );
 }
@@ -145,12 +165,13 @@ function randomSchemes(slides, current) {
   return slides.map((s) => (s.kind === "media" ? { key, accent: sc.photo } : { key }));
 }
 
-function Slide({ slide, i, total, profile, draft, editable, showCounter }) {
+function Slide({ slide, i, total, profile, draft, editable }) {
   const copy = draft.copy[i] || {};
   const head = copy.head ?? slide.head;
   const sub = copy.sub ?? slide.sub;
   const list = copy.list ?? slide.list;
   const pos = copy.pos || slide.pos || "bottom";
+  const align = copy.align || slide.align || "left";
   const items = list ? list.split("\n").filter(Boolean) : [];
   const isMedia = slide.kind === "media";
   const sc = (draft.schemes || [])[i] || {};
@@ -158,19 +179,19 @@ function Slide({ slide, i, total, profile, draft, editable, showCounter }) {
   const light = !!scheme.light;
   const vars = {
     "--s-bg": scheme.bg,
-    "--s-ink": scheme.ink,
+    "--s-ink": copy.ink || scheme.ink,
     "--s-scrim": scheme.bg,
     "--s-accent": isMedia ? (light ? scheme.accent : (sc.accent || scheme.photo)) : scheme.accent,
   };
 
   return (
-    <div className={"slide slide--" + slide.kind + (light ? " is-light" : "")} style={vars} data-screen-label={`Slide ${i + 1}`}>
+    <div className={"slide slide--" + slide.kind + (light ? " is-light" : "") + (i === 0 || i === total - 1 ? " slide--lock" : "")} style={vars} data-screen-label={`Slide ${i + 1}`}>
       {isMedia
         ? <MediaSlot slotKey={`${draft.templateId}_${i}`} hint={slide.hint} editable={editable} />
         : <div className="slide__solid" />}
       {isMedia ? <div className="slide__scrim" data-pos={pos} /> : null}
 
-      <div className={"slide__body slide__body--" + pos}>
+      <div className={"slide__body slide__body--" + pos} data-align={align}>
         <span className="slide__rule" />
         <h2 className="slide__head"><RichText text={head} /></h2>
         {items.length ? (
@@ -190,8 +211,12 @@ function Slide({ slide, i, total, profile, draft, editable, showCounter }) {
         ) : null}
       </div>
 
-      {slide.kind === "cta" ? <Lockup profile={profile} light={light} /> : null}
-      {showCounter && total > 1 ? <span className="slide__count">{i + 1}/{total}</span> : null}
+      {i === 0 || i === total - 1 ? <Lockup light={light && i === total - 1} /> : null}
+      {slide.kind === "cta" && profile.brokerage ? (
+        <div className="brokerline">
+          <img src={light ? "assets/real-full-black.png" : "assets/real-full-white.png"} alt="Brokered by Real Broker" />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -254,13 +279,59 @@ async function copyText(text) {
 }
 
 /* ---------- small ui ---------- */
-function Field({ label, value, onChange, area, rows = 3, placeholder }) {
+function Field({ label, value, onChange, area, rows = 3, placeholder, format }) {
+  const ref = useRef(null);
+  const pend = useRef(null);
+  useLayoutEffect(() => {
+    if (pend.current && ref.current) {
+      const [a, b] = pend.current; pend.current = null;
+      ref.current.focus(); ref.current.setSelectionRange(a, b);
+    }
+  }, [value]);
+  const wrap = (mark, prefix = "") => {
+    const el = ref.current;
+    if (!el) return;
+    const { selectionStart: a, selectionEnd: b } = el;
+    if (a === b) { el.focus(); return; }
+    const picked = value.slice(a, b);
+    const wrapped = picked.startsWith(mark) && picked.endsWith(mark) && picked.length > 2;
+    let next;
+    if (wrapped) {
+      const inner = picked.slice(1, -1).replace(/^[1-5]\|/, "");
+      next = prefix && !picked.slice(1, -1).startsWith(prefix) ? mark + prefix + inner + mark : inner;
+    } else {
+      next = mark + prefix + picked + mark;
+    }
+    pend.current = [a, a + next.length];
+    onChange(value.slice(0, a) + next + value.slice(b));
+  };
   return (
     <label className="field">
       <span className="field__label">{label}</span>
+      {format ? (
+        <div className="fmt">
+          <button type="button" className="fmt__b" onMouseDown={(e) => e.preventDefault()} onClick={() => wrap("*")}>
+            <span className="fmt__dot"></span>Highlight
+          </button>
+          <button type="button" className="fmt__b" onMouseDown={(e) => e.preventDefault()} onClick={() => wrap("_")}>
+            <i>I</i>talic
+          </button>
+          <button type="button" className="fmt__b" onMouseDown={(e) => e.preventDefault()} onClick={() => wrap("~")}>
+            <u>U</u>nderline
+          </button>
+          <span className="fmt__tip">select a word first</span>
+          <div className="swatches">
+            {HILITE.filter((h) => h.k).map((h) => (
+              <button key={h.k} type="button" className="swatch" title={"Highlight in " + h.label}
+                style={{ background: h.css }}
+                onMouseDown={(e) => e.preventDefault()} onClick={() => wrap("*", h.k + "|")} />
+            ))}
+          </div>
+        </div>
+      ) : null}
       {area
-        ? <textarea rows={rows} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-        : <input type="text" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />}
+        ? <textarea ref={ref} rows={rows} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+        : <input ref={ref} type="text" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />}
     </label>
   );
 }
@@ -272,4 +343,4 @@ function Seg({ options, value, onChange }) {
   );
 }
 
-window.ERGB = { RichText, MediaSlot, Slide, slideToPng, download, copyText, Field, Seg, load, save, mediaDel, DEFAULT_PROFILE, randomSchemes, SCHEMES };
+window.ERGB = { RichText, MediaSlot, Slide, slideToPng, download, copyText, Field, Seg, load, save, mediaDel, DEFAULT_PROFILE, randomSchemes, SCHEMES, HILITE };
